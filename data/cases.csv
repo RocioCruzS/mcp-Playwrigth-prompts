@@ -1,0 +1,21 @@
+Case ID	Case	Configurations	Created at	Created by	Description	Estimate	Expected	Folder	Forecast	Issues	Preconditions (Step)	Priority	State	Status (latest)	Status date	Steps (Expected)	Steps (Step)	Tags	Template	Updated at	Updated by
+1	User Login		2025-07-02T22:00:22.422Z	Rocio Cruz				DEMO - Test Cases			<p>Be on login page</p>	Normal	Active			"<p>“Swag Labs” logo is visible</p>
+<p>Fields populated</p>
+<p>Inventory page with title 'Products'</p>"	"<p>Enter username/password: standard_user/secret_sauce</p>
+<p>Click Login</p>"		Case (steps)	2025-07-03T16:44:25.989Z	Rocio Cruz
+2	Access Product Detail		2025-07-02T22:00:22.434Z	Rocio Cruz				DEMO - Test Cases			<p>User is on Inventory page</p>	Normal	Active			"<p>Page title 'Products</p>
+<p>Product title on detail page matches recorded name</p>"	"<p>Record item_5's name</p>
+<p>Click 5th item title</p>"		Case (steps)	2025-07-02T22:31:51.658Z	Rocio Cruz
+3	Add Product to Cart		2025-07-02T22:00:22.440Z	Rocio Cruz	<p>User is on product detail page</p>			DEMO - Test Cases			<p>User is on product detail page for any product</p>	Normal	Active			<p>Verify cart contents</p>	"<p>Record information about prices, title and description</p>
+<p>Click Add to cart</p>
+<p>Click shopping cart icon</p>"		Case (steps)	2025-07-02T22:36:49.146Z	Rocio Cruz
+4	Checkout Workflow		2025-07-02T22:00:22.447Z	Rocio Cruz				DEMO - Test Cases			"<p>User is in cart page</p>
+<p>User has one product added in cart</p>"	Normal	Active			"<p>Shipping fields populated</p>
+<p>Overview page shows  expected info</p>
+<p>Correct succesfull message is shown</p>"	"<p>Click Checkout</p>
+<p>Enter shipping info: Jan, Novak, 10400</p>
+<p>Click Continue</p>
+<p>Click Finish</p>"		Case (steps)	2025-07-03T16:44:57.168Z	Rocio Cruz
+5	Logout		2025-07-02T22:00:22.453Z	Rocio Cruz				DEMO - Test Cases			<p>User is on Log in</p>	Normal	Active			<p>Login button visible</p>	"<p>Click burger menu</p>
+<p>Menu visible</p>
+<p>Click Logout</p>"		Case (steps)	2025-07-02T22:41:41.657Z	Rocio Cruz
