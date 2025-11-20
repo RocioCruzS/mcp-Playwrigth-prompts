@@ -79,9 +79,11 @@ Los prompts disponibles en `.github/prompts/` están diseñados para ser usados 
 1. Abre un archivo `.prompt.md`
 2. Copiar el contenido
 3. Paste en la ventana de Copilot Chat (Ctrl+Shift+I / Cmd+Shift+I)
-4. Copilot utilizará el contexto y generará el código automáticamente
-5. Desde el chat como se muestra en la imagen
+
 ![alt text](image-2.png)
+4. Todas las herramientas que ofrece MCp de playwright con (darle click al icono en de tools en el chat como se muestra en la primera imagen).
+![alt text](image-4.png)
+![alt text](image-3.png)
 ### 4. **Chat Modes**
 
 El archivo `.github/chat/playwright-tester.chatmode.md` define el comportamiento del chat mode para testing:
