@@ -62,7 +62,7 @@ En VS Code:
 3. Instala la extensión oficial.
 4. Autentica con tu cuenta de GitHub
 
-### 2. **Configurar el MCP en GitHub Copilot - Opcional si solo quiere usar el Copilot de Github**
+### 2. **Configurar el MCP**
 
 1. Ve al repo oficial de [MCP de playwrigth](https://github.com/microsoft/playwright-mcp)
 2. Ve a la instalcion de VSC y click en el boton de instalar VSC
