@@ -1,6 +1,6 @@
 # MCP Playwright Prompts - GitHub Copilot Integration
 
-Este repositorio proporciona **prompts personalizados**, **instrucciones**, y **configuración de chat** para integrar **GitHub Copilot** con **Playwright MCP** (Model Context Protocol) para automatización de pruebas.
+Este repositorio proporciona **prompts personalizados**, **instrucciones**, y **configuración de chat** para integrar **GitHub Copilot** con **MCP de Playwright** (Model Context Protocol) para automatización de pruebas.
 
 ## 📋 Tabla de Contenidos
 
@@ -18,7 +18,7 @@ Este repositorio proporciona **prompts personalizados**, **instrucciones**, y **
 
 Este proyecto es una **plantilla MCP para Playwright** que demuestra:
 
-- ✅ Integración de **GitHub Copilot** con **Playwright MCP**
+- ✅ Integración de **GitHub Copilot** con **MCP de Playwright**
 - ✅ Generación automatizada de **test cases** desde CSV
 - ✅ Estructura **Page Object Model (POM)** completa
 - ✅ Prompts reutilizables para tareas comunes de testing
@@ -52,28 +52,25 @@ mcp-Playwrigth-prompts/
 
 ## 🤖 Configuración de GitHub Copilot
 
-Para usar **GitHub Copilot** con **Playwright MCP**, sigue estos pasos:
+Para usar **GitHub Copilot** con **MCP de Playwright**, sigue estos pasos:
 
 ### 1. **Instalar la Extensión de GitHub Copilot**
 
 En VS Code:
 1. Ve a Extensions (Ctrl+Shift+X / Cmd+Shift+X)
-2. Busca "GitHub Copilot"
-3. Instala la extensión oficial de GitHub
+2. Busca "GitHub Copilot" y activalo en tu cuenta de Github
+3. Instala la extensión oficial.
 4. Autentica con tu cuenta de GitHub
 
-### 2. **Configurar el MCP en GitHub Copilot**
+### 2. **Configurar el MCP en GitHub Copilot - Opcional si solo quiere usar el Copilot de Github**
 
-Agrega la siguiente configuración a tu `settings.json` en VS Code:
+1. Ve al repo oficial de [MCP de playwrigth](https://github.com/microsoft/playwright-mcp)
+2. Ve a la instalcion de VSC y click en el boton de instalar VSC
 
-```json
-{
-  "github.copilot.advanced": {
-    "debug.overrideChatModel": "claude-haiku-4.5",
-    "debug.testChatModel": true
-  }
-}
-```
+![alt text](image-1.png)
+
+3. Y esta listo para usar desde la parte superior de VSC, recuerda siempre usar el MCp en modo agente 
+![alt text](image.png)
 
 ### 3. **Usar Prompts con Copilot**
 
@@ -83,7 +80,8 @@ Los prompts disponibles en `.github/prompts/` están diseñados para ser usados 
 2. Copiar el contenido
 3. Paste en la ventana de Copilot Chat (Ctrl+Shift+I / Cmd+Shift+I)
 4. Copilot utilizará el contexto y generará el código automáticamente
-
+5. Desde el chat como se muestra en la imagen
+![alt text](image-2.png)
 ### 4. **Chat Modes**
 
 El archivo `.github/chat/playwright-tester.chatmode.md` define el comportamiento del chat mode para testing:
@@ -101,9 +99,9 @@ El archivo `.github/chat/playwright-tester.chatmode.md` define el comportamiento
 - **npm** 7.0+
 - **GitHub Copilot** extension instalada en VS Code
 
-### Pasos de Instalación
+### Pasos de Instalación 
 
-1. **Clonar el repositorio:**
+1. **Desde el repositorio:**
    ```bash
    git clone https://github.com/RocioCruzS/mcp-Playwrigth-prompts.git
    cd mcp-Playwrigth-prompts
@@ -114,19 +112,6 @@ El archivo `.github/chat/playwright-tester.chatmode.md` define el comportamiento
    npm install
    ```
 
-3. **Instalar navegadores de Playwright:**
-   ```bash
-   npx playwright install
-   ```
-
-4. **Configurar variables de entorno:**
-   
-   Crea un archivo `.env` en la raíz del proyecto:
-   ```env
-   BASE_URL=https://www.saucedemo.com/
-   USERNAME=standard_user
-   PASSWORD=secret_sauce
-   ```
 
 ## 📖 Cómo Usar Este Proyecto
 
