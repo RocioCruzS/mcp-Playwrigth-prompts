@@ -1,0 +1,188 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main, development, feature/*]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'stg'
+        type: choice
+        options:
+          - qa
+          - stg
+          - prod
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - checkout
+          - membership
+          - auth
+
+env:
+  NODE_VERSION: '18.x'
+  TARGET_ENV: ${{ github.event.inputs.environment || 'qa' }}
+  TEST_SUITE: ${{ github.event.inputs.test_suite || 'all' }}
+
+jobs:
+  test:
+    name: Run Playwright Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🧼 Run ESLint
+        run: npm run lint
+
+      - name: 🎭 Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: 🧹 Clean previous results
+        run: npm run clean
+
+      - name: 🧪 Run Playwright Tests
+        id: playwright_tests
+        continue-on-error: true
+        env:
+          CI: true
+          USER_NAME: ${{ secrets.TEST_USER_NAME }}
+          PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+        run: |
+          if [ "${{ env.TEST_SUITE }}" = "all" ]; then
+            npm run test:ci
+          elif [ "${{ env.TEST_SUITE }}" = "checkout" ]; then
+            npm run test:checkout
+          elif [ "${{ env.TEST_SUITE }}" = "membership" ]; then
+            npm run test:membership
+          elif [ "${{ env.TEST_SUITE }}" = "auth" ]; then
+            npm run test:auth
+          fi
+
+      - name: 📊 Generate Allure Report
+        if: always()
+        run: npm run allure:generate
+
+      - name: 📤 Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 30
+
+      - name: 📤 Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+
+      - name: 📤 Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: 🚀 Deploy Allure Report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: allure-report/${{ github.run_number }}
+          keep_files: true
+
+      - name: 📝 Set Test Result Status
+        if: always()
+        id: test_status
+        run: |
+          if [ "${{ steps.playwright_tests.outcome }}" = "success" ]; then
+            echo "status=✅ PASSED" >> $GITHUB_OUTPUT
+            echo "color=#36a64f" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ FAILED" >> $GITHUB_OUTPUT
+            echo "color=#ff0000" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📢 Send Slack Notification
+        if: always()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*EXECUTED: ${{ env.TEST_SUITE == 'all' && 'ALL TESTS' || format('{0} TESTS', env.TEST_SUITE) }}* SUITE"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "\n *Result:* ${{ steps.test_status.outputs.status }}. See the report below. \n *Target Environment:* ${{ env.TARGET_ENV }} \n \n> *GitHub Branch*: _${{ github.ref_name }}_"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Go to Report",
+                        "emoji": true
+                      },
+                      "url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report/${{ github.run_number }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Workflow",
+                        "emoji": true
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "divider"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: ❌ Fail job if tests failed
+        if: steps.playwright_tests.outcome != 'success'
+        run: exit 1

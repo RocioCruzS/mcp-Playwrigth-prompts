@@ -1,0 +1,36 @@
+{
+  "name": "mcp-playwrigth-prompts",
+  "version": "1.0.0",
+  "description": "Este repositorio proporciona **prompts personalizados**, **instrucciones**, y **configuración de chat** para integrar **GitHub Copilot** con **MCP de Playwright** (Model Context Protocol) para automatización de pruebas.",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:chromium": "playwright test --project=chromium",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RocioCruzS/mcp-Playwrigth-prompts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/RocioCruzS/mcp-Playwrigth-prompts/issues"
+  },
+  "homepage": "https://github.com/RocioCruzS/mcp-Playwrigth-prompts#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-playwright": "^2.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

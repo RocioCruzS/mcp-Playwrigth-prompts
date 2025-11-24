@@ -91,7 +91,7 @@ use: {
 
 # 11. Linting
 - Configure ESLint using the eslint-plugin-playwright.
-- Include .eslintrc.js config.
+- Include .eslintrc.config.js 
 
 Edit package json if needed and after that perform npm install
 
