@@ -83,36 +83,56 @@ jobs:
           echo "Running script: npm run $NPM_SCRIPT"
           npm run $NPM_SCRIPT
 
+      - name: 📊 Generate Allure Report
+        if: always()
+        run: npm run allure:generate
+
       ## 🟢 PASO 1: DESPLIEGUE A GITHUB PAGES
-      - name: 🚀 Deploy Playwright Report to GitHub Pages
+      - name: 🚀 Deploy Allure Report to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./playwright-report
+          publish_dir: ./allure-report
           # Usamos el número de ejecución como subdirectorio
-          destination_dir: playwright-report/${{ github.run_number }}
+          destination_dir: allure-report/${{ github.run_number }}
           keep_files: false
 
       ## 🟢 PASO 2: LOGUEAR Y CREAR LA URL WEB DIRECTA
-      - name: 📢 Set Playwright Report URL
+      - name: 📢 Set Allure Report URL
         if: always()
         id: report_output
         run: |
-          # Construye la URL pública
-          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright-report/${{ github.run_number }}"
+          # Construye la URL pública del reporte Allure
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report/${{ github.run_number }}"
           
           # Guarda la URL en una variable de entorno GITHUB_ENV para que Slack pueda acceder a ella
-          echo "PLAYWRIGHT_REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
+          echo "ALLURE_REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
           
           # También la guarda en GITHUB_OUTPUT para otros steps
           echo "url=$REPORT_URL" >> $GITHUB_OUTPUT
           
           echo "========================================="
-          echo "✅ Playwright Report Public URL: $REPORT_URL"
+          echo "✅ Allure Report Public URL: $REPORT_URL"
           echo "========================================="
       
-      - name: 📤 Upload Playwright Report (Artifact)
+      - name: 📤 Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 30
+      
+      - name: 📤 Upload Allure Report (Artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+      
+      - name: 📤 Upload Playwright HTML Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -173,7 +193,7 @@ jobs:
                         "text": "Go to Report",
                         "emoji": true
                       },
-                      "url": "${{ env.PLAYWRIGHT_REPORT_URL }}"
+                      "url": "${{ env.ALLURE_REPORT_URL }}"
                     },
                     {
                       "type": "button",
