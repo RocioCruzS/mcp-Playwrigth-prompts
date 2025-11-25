@@ -13,7 +13,7 @@ test.describe('SauceDemo - E2E Tests', () => {
 
   test('Login - Valid credentials', async ({ page }) => {
     await test.step('Navigate to login page', async () => {
-      await expect(page).toHaveURL(process.env.BASE_URL);
+      await expect(page).toHaveURL(process.env.BASE_URL || 'https://www.saucedemo.com/');
     });
 
     await test.step('Login with valid credentials', async () => {
