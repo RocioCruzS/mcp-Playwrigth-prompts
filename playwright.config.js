@@ -32,7 +32,7 @@ export default defineConfig({
     video: 'on',
 
     /* Run tests in headed mode */
-    headless: false,
+    headless: true,
   },
 
   /* Configure projects for major browsers */
