@@ -1,0 +1,4 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","31890","Login - Valid credentials","chromium","Tue Nov 25 19:10:49 UTC 2025","broken","Tue Nov 25 19:11:21 UTC 2025","SauceDemo - E2E Tests","example.spec.js","",""
+"","31876","Cart - Add item","chromium","Tue Nov 25 19:12:28 UTC 2025","broken","Tue Nov 25 19:12:59 UTC 2025","SauceDemo - E2E Tests","example.spec.js","",""
+"","31908","Checkout - Complete purchase","chromium","Tue Nov 25 19:14:05 UTC 2025","broken","Tue Nov 25 19:14:37 UTC 2025","SauceDemo - E2E Tests","example.spec.js","",""
