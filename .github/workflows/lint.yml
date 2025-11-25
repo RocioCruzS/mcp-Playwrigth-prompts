@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: 🧼 Run ESLint
         run: npm run lint
@@ -34,4 +34,4 @@ jobs:
       - name: 📊 Annotate code linting results
         if: failure()
         run: |
-          echo "::error::ESLint found issues in the code. Run 'npm run lint:fix' locally to auto-fix some issues."
+          echo "::error::ESLint found issues in the code. Please fix the linting errors before pushing."
