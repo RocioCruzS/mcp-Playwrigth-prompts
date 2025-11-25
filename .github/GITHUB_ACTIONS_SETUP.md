@@ -112,13 +112,22 @@ https://RocioCruzS.github.io/mcp-Playwrigth-prompts/playwright-report/42
 
 ## 🧪 Ejecución Manual del Workflow
 
-Puedes ejecutar las pruebas manualmente:
+Puedes ejecutar las pruebas manualmente con opciones personalizadas:
 
 1. Ve a la pestaña **Actions**
 2. Selecciona el workflow **Playwright Tests**
 3. Haz clic en **Run workflow**
-4. Selecciona la branch deseada
+4. Selecciona las opciones:
+   - **Target environment:** `qa`, `stg`, o `prod` (default: `stg`)
+   - **Test suite to run:** `auth`, `checkout`, `membership`, o `all` (default: `auth`)
 5. Haz clic en **Run workflow**
+
+### Opciones de Test Suite
+
+- **auth**: Ejecuta solo las pruebas de autenticación
+- **checkout**: Ejecuta solo las pruebas de checkout
+- **membership**: Ejecuta solo las pruebas de membership
+- **all**: Ejecuta todas las pruebas disponibles
 
 ---
 
@@ -128,13 +137,27 @@ Cada ejecución de pruebas genera:
 
 1. **playwright-report**
    - Reporte HTML interactivo de Playwright
-   - Disponible por 30 días
-   - También publicado en GitHub Pages
+   - Disponible por 30 días como artifact
+   - También publicado automáticamente en GitHub Pages
 
 2. **test-videos**
    - Videos de todas las pruebas ejecutadas
    - Screenshots y trazas en caso de fallos
    - Disponible por 7 días
+
+### 🔗 URL del Reporte
+
+La URL del reporte se genera automáticamente y se muestra en:
+- **Console log** del workflow (paso "Set Playwright Report URL")
+- **Notificación de Slack** (botón "Go to Report")
+- **GitHub Pages**: `https://<usuario>.github.io/<repo>/playwright-report/<run-number>`
+
+Ejemplo de salida en console:
+```
+=========================================
+✅ Playwright Report Public URL: https://RocioCruzS.github.io/mcp-Playwrigth-prompts/playwright-report/42
+=========================================
+```
 
 ---
 

@@ -4,36 +4,65 @@ on:
   push:
     branches: [main, development, feature/*]
   pull_request:
-    branches: [main, develop]
+    branches: [main, development]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'stg'
+        type: choice
+        options:
+          - qa
+          - stg
+          - prod
+      test_suite:
+        description: 'Test suite to run (optional - default: auth)'
+        required: false
+        default: 'auth'
+        type: choice
+        options:
+          - auth
+          - checkout
+          - membership
+          - all
 
 env:
   NODE_VERSION: '18.x'
+  TARGET_ENV: ${{ github.event.inputs.environment || 'stg' }}
+  TEST_SUITE: ${{ github.event.inputs.test_suite || 'auth' }}
+  PLAYWRIGHT_BROWSERS_PATH: '0'
 
 jobs:
   test:
     name: Run Playwright Tests
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
 
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Setup Node.js & Cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: 📦 Install dependencies
-        run: npm ci
+      - name: 📦 Install dependencies & Browsers
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
 
       - name: 🧼 Run ESLint
         run: npm run lint
 
-      - name: 🎭 Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+      - name: 🧹 Clean previous results
+        run: npm run clean
 
       - name: 🧪 Run Playwright Tests
         id: playwright_tests
@@ -43,16 +72,54 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
           BASE_URL: ${{ secrets.BASE_URL || 'https://www.saucedemo.com/' }}
-        run: npm run test:chromium
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+        run: |
+          if [ "${{ env.TEST_SUITE }}" = "all" ]; then
+            NPM_SCRIPT="test:ci"
+          else
+            NPM_SCRIPT="test:${{ env.TEST_SUITE }}"
+          fi
+          
+          echo "Running script: npm run $NPM_SCRIPT"
+          npm run $NPM_SCRIPT
 
-      - name: 📤 Upload Playwright Report
+      ## 🟢 PASO 1: DESPLIEGUE A GITHUB PAGES
+      - name: 🚀 Deploy Playwright Report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          # Usamos el número de ejecución como subdirectorio
+          destination_dir: playwright-report/${{ github.run_number }}
+          keep_files: false
+
+      ## 🟢 PASO 2: LOGUEAR Y CREAR LA URL WEB DIRECTA
+      - name: 📢 Set Playwright Report URL
+        if: always()
+        id: report_output
+        run: |
+          # Construye la URL pública
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright-report/${{ github.run_number }}"
+          
+          # Guarda la URL en una variable de entorno GITHUB_ENV para que Slack pueda acceder a ella
+          echo "PLAYWRIGHT_REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
+          
+          # También la guarda en GITHUB_OUTPUT para otros steps
+          echo "url=$REPORT_URL" >> $GITHUB_OUTPUT
+          
+          echo "========================================="
+          echo "✅ Playwright Report Public URL: $REPORT_URL"
+          echo "========================================="
+      
+      - name: 📤 Upload Playwright Report (Artifact)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
+      
       - name: 📤 Upload Test Videos
         if: always()
         uses: actions/upload-artifact@v4
@@ -60,15 +127,6 @@ jobs:
           name: test-videos
           path: test-results/
           retention-days: 7
-
-      - name: 🚀 Deploy Playwright Report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./playwright-report
-          destination_dir: playwright-report/${{ github.run_number }}
-          keep_files: true
 
       - name: 📝 Set Test Result Status
         if: always()
@@ -83,7 +141,7 @@ jobs:
           fi
 
       - name: 📢 Send Slack Notification
-        if: always() && vars.ENABLE_SLACK_NOTIFICATIONS == 'true'
+        if: always()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
@@ -93,7 +151,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*SauceDemo E2E Tests*"
+                    "text": "*EXECUTED: ${{ env.TEST_SUITE == 'all' && 'ALL TESTS' || format('{0} TESTS', env.TEST_SUITE) }}* SUITE"
                   }
                 },
                 {
@@ -101,7 +159,7 @@ jobs:
                   "elements": [
                     {
                       "type": "mrkdwn",
-                      "text": "\n *Result:* ${{ steps.test_status.outputs.status }} \n *Environment:* https://www.saucedemo.com/ \n> *GitHub Branch*: _${{ github.ref_name }}_"
+                      "text": "\n *Result:* ${{ steps.test_status.outputs.status }}. See the report below. \n *Target Environment:* ${{ env.TARGET_ENV }} \n \n> *GitHub Branch*: _${{ github.ref_name }}_"
                     }
                   ]
                 },
@@ -112,10 +170,10 @@ jobs:
                       "type": "button",
                       "text": {
                         "type": "plain_text",
-                        "text": "View Report",
+                        "text": "Go to Report",
                         "emoji": true
                       },
-                      "url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright-report/${{ github.run_number }}"
+                      "url": "${{ env.PLAYWRIGHT_REPORT_URL }}"
                     },
                     {
                       "type": "button",
